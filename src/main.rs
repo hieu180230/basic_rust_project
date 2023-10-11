@@ -28,7 +28,7 @@ fn main() -> Result<(), Box<dyn Error>>{
         let mut stdout = io::stdout();
         render::render(&mut stdout, &last_frame, &last_frame, true);
         loop {
-            let cur_frame = match render_rx.recv() {
+            let mut cur_frame = match render_rx.recv() {
                 Ok(x) => x,
                 Err(_) => break,
             };
@@ -46,7 +46,7 @@ fn main() -> Result<(), Box<dyn Error>>{
         while event::poll(Duration::default())?{
             if let Event::Key(key_event) = event::read()?{
                 match key_event.code{
-                    KeyCode::Esc => {
+                    KeyCode::Esc | KeyCode::Char('q') => {
                         break 'gameloop;
                     }
                     _ => {}

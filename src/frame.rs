@@ -1,3 +1,4 @@
+use crate::{COLS, ROWS};
 pub type Frame = Vec<Vec<&'static str>>;
 
 pub fn new_frame() -> Frame{

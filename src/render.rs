@@ -1,8 +1,13 @@
-use std::io::Stdout;
+use std::io::{Stdout, Write};
 use crate::frame::Frame;
-use crossterm::{QueueableCommand, style::{SetBackgroundColor, Color}};
+use crossterm::{
+    cursor::MoveTo,
+    style::{Color, SetBackgroundColor, SetForegroundColor},
+    terminal::{Clear, ClearType},
+    QueueableCommand,
+};
 
-pub fn render(stdout: &mut Stdout, last_frame: &Frame, cur_frame: &mut Frame, force:bool){
+pub fn render(stdout: &mut Stdout, last_frame: &Frame, cur_frame: &Frame, force:bool){
     if force{
         stdout.queue(SetBackgroundColor(Color::Blue)).unwrap();
         stdout.queue(Clear(ClearType::All)).unwrap();
@@ -12,7 +17,7 @@ pub fn render(stdout: &mut Stdout, last_frame: &Frame, cur_frame: &mut Frame, fo
         for (y, s) in col.iter().enumerate(){
             if *s != last_frame[x][y] || force{
                 stdout.queue(MoveTo(x as u16, y as u16)).unwrap();
-                print("{}", *s);
+                print!("{}", *s);
             }
         }
     }
