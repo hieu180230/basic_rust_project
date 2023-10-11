@@ -1,11 +1,11 @@
 #![allow(unused_variables, unused_mut, dead_code, unused_imports, unused_labels)]
+use basic_project::{frame, render};
 use std::{error::Error, thread, io};
 use crossterm::{terminal::{self, EnterAlternateScreen, LeaveAlternateScreen}, ExecutableCommand, cursor::{Hide, Show},
 event::Event, event, event::KeyCode};
 use rusty_audio::Audio;
 use std::time::Duration;
 use crossbeam::channel;
-use basic_project::{frame, render};
 
 fn main() -> Result<(), Box<dyn Error>>{
     //music
