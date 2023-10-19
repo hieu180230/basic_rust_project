@@ -4,8 +4,10 @@ use std::{error::Error, thread, io};
 use crossterm::{terminal::{self, EnterAlternateScreen, LeaveAlternateScreen}, ExecutableCommand, cursor::{Hide, Show},
 event::Event, event, event::KeyCode};
 use rusty_audio::Audio;
-use std::time::Duration;
+use std::time::{Duration, Instant};
 use crossbeam::channel;
+use basic_project::frame::drawable;
+use basic_project::player::Player;
 
 fn main() -> Result<(), Box<dyn Error>>{
     //music
@@ -36,16 +38,23 @@ fn main() -> Result<(), Box<dyn Error>>{
             last_frame = cur_frame;
         }
     });
+    //player
+    let mut player = Player::new();
+    let mut instant = Instant::now();
 
     //game
     'gameloop: loop{
+        player.shoot();
         //draw
-        let cur_frame = frame::new_frame();
-
+        let mut cur_frame = frame::new_frame();
+        let delta = instant.elapsed();
+        instant = Instant::now();
         //input
         while event::poll(Duration::default())?{
             if let Event::Key(key_event) = event::read()?{
                 match key_event.code{
+                    KeyCode::Left => {player.move_left();}
+                    KeyCode::Right => {player.move_right();}
                     KeyCode::Esc | KeyCode::Char('q') => {
                         break 'gameloop;
                     }
@@ -54,7 +63,11 @@ fn main() -> Result<(), Box<dyn Error>>{
             }
         }
 
+        //upadate
+        player.update(delta);
+
         //render
+        player.draw(&mut cur_frame);
         let _ = render_tx.send(cur_frame);
         thread::sleep(Duration::from_millis(1));
     }
