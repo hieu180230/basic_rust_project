@@ -6,7 +6,8 @@ event::Event, event, event::KeyCode};
 use rusty_audio::Audio;
 use std::time::{Duration, Instant};
 use crossbeam::channel;
-use basic_project::frame::drawable;
+use basic_project::frame::Drawable;
+use basic_project::invader::Invaders;
 use basic_project::player::Player;
 
 fn main() -> Result<(), Box<dyn Error>>{
@@ -41,7 +42,7 @@ fn main() -> Result<(), Box<dyn Error>>{
     //player
     let mut player = Player::new();
     let mut instant = Instant::now();
-
+    let mut invaders = Invaders::new();
     //game
     'gameloop: loop{
         player.shoot();
@@ -65,11 +66,20 @@ fn main() -> Result<(), Box<dyn Error>>{
 
         //upadate
         player.update(delta);
+        invaders.update(delta);
+        player.hit(&mut invaders);
 
         //render
-        player.draw(&mut cur_frame);
+        let drawables: Vec<&dyn Drawable> = vec![&player, &invaders];
+        for drawable in drawables{
+            drawable.draw(&mut cur_frame);
+        }
         let _ = render_tx.send(cur_frame);
         thread::sleep(Duration::from_millis(1));
+
+        //win
+        if invaders.all_killed() { println!("win"); break 'gameloop}
+        if invaders.bottom() {println!("lose"); break 'gameloop}
     }
 
 

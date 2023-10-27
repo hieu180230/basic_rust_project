@@ -13,6 +13,6 @@ pub fn new_frame() -> Frame{
     return cols;
 }
 
-pub trait drawable{
+pub trait Drawable{
     fn draw(&self, frame: &mut Frame);
 }
